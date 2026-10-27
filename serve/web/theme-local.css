@@ -90,3 +90,10 @@
 
 /* the API Monitor page (monitor.html) carries the same mark in its header */
 .brand-mark{width:26px;height:26px;vertical-align:-6px}
+
+/* toasts: the kit anchors the stack to the bottom-right, which at a phone width is the composer's
+   corner. Measured at 390x640: one toast covers the whole 42x42 Send button, two stacked ones
+   (311x157) also cover the whole 48px input. Lift it by the composer's own height instead:
+   app-local.js publishes --composer-h (132px is that height at rest - one-line draft, no
+   attachments - and stays correct as a draft or an attachment row grows the composer). */
+.st-toasts{bottom:calc(var(--composer-h,132px) + 12px)}
