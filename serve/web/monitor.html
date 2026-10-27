@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Strata API Monitor</title>
-<link rel="icon" href="/web/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/web/favicon-local.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/web/tokens.css">
+<link rel="stylesheet" href="/web/theme-local.css">
 <style>
 *{box-sizing:border-box}body{margin:0;background:var(--st-bg);color:var(--st-ink);font:15px/1.5 var(--st-font)}
 button,input,select{font:inherit}button{cursor:pointer;color:inherit;background:var(--st-surface-2);border:1px solid var(--st-line);border-radius:9px;padding:8px 13px}button:hover{border-color:var(--st-accent)}button:disabled{opacity:.4;cursor:default}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--st-focus);outline-offset:3px}[hidden]{display:none!important}
@@ -14,7 +15,7 @@ header{height:70px;padding:0 32px;display:flex;align-items:center;justify-conten
 <script defer src="/web/monitor.js"></script>
 </head>
 <body>
-<header><div class="brand">Strata <span>Local inference</span></div><div class="controls"><button id="key">API key</button><button id="theme" aria-label="Switch color theme">Light / dark</button></div></header>
+<header><div class="brand"><svg class="brand-mark" viewBox="0 0 32 32" role="img" aria-label="Strata"><path d="M16 2.38 28.42 9.08 16 15.78 3.58 9.08Z" fill="currentColor"/><path d="M3.58 14.8 16 21.5 28.42 14.8" fill="none" stroke="currentColor" stroke-width="3.67" stroke-linecap="round" stroke-linejoin="round" opacity=".92"/><path d="M3.58 21.28 16 27.98 28.42 21.28" fill="none" stroke="currentColor" stroke-width="3.67" stroke-linecap="round" stroke-linejoin="round" opacity=".78"/></svg><span>Local inference</span></div><div class="controls"><button id="key">API key</button><button id="theme" aria-label="Switch color theme">Light / dark</button></div></header>
 <main>
 <div class="top"><div><h1>API Monitor</h1><p class="sub">Model status and every request, in one place.</p></div><div class="controls"><button id="load" class="primary" disabled>Load model</button><button id="unload" disabled>Unload model</button></div></div>
 <div id="error" class="notice" role="status" hidden></div>

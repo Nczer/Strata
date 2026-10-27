@@ -1,0 +1,92 @@
+/* Fork-local theme for the served web app. Loaded after tokens/components/app.css, so these
+   rules win by source order; the kit files stay untouched so pulling upstream stays cheap.
+   If upstream renames a class or a token, the matching rule here goes quiet - re-check after a
+   big pull (the numbers in the comments come from the WCAG 2.1 formula, not from eye).
+
+   Colours follow the pi theme mountain-fuji (~/.pi/agent/themes/mountain-fuji.json): a neutral
+   grey ladder plus muted hues (chroma .09-.22 in light, .12-.30 in dark, ochre being the
+   warmest), so hue only ever carries meaning: steel-teal is the action, steel blue is reading,
+   ochre is waiting, clay is trouble. Light values are derived - that theme has no light mode. */
+
+:root{
+  /* type: Helvetica Neue where it exists, Inter next, Outfit last (the kit bundles it) */
+  --st-font:"Helvetica Neue",Helvetica,Inter,"Outfit",system-ui,sans-serif;
+
+  /* corners: one step tighter than the kit */
+  --st-r-sm:6px; --st-r-md:10px; --st-r-lg:14px; --st-r-xl:16px;
+
+  /* color - light */
+  --st-bg:#f4f4f4;
+  --st-surface:#ffffff;
+  --st-surface-2:#ececec;
+  --st-line:#dcdcdc;             /* 1.37:1: a rule you can see, not a shadow */
+  --st-line-soft:#ececec;
+  --st-ink:#191919;              /* 17.6:1 */
+  --st-ink-soft:#393939;         /* 11.5:1 */
+  --st-ink-muted:#4c4c4c;        /* 8.6:1 on white, 7.3:1 on surface-2 */
+  --st-icon:#393939;
+
+  --st-accent:#4d6866;           /* mizu, darkened for light mode; 6.0:1 under a white label */
+  --st-accent-hover:#3f5756;
+  --st-accent-ink:#ffffff;
+  --st-accent-tint:#e9efee;
+  --st-accent-text:#405957;      /* 7.5:1 on white, 6.5:1 on the tint */
+  --st-focus:#4d6866;
+
+  --st-info:#4d5f74;     --st-info-tint:#ebeef2;    --st-info-text:#42536a;   /* reading */
+  --st-warn:#6f5a37;     --st-warn-tint:#f2efe8;    --st-warn-text:#5d4b2d;   /* waiting */
+  --st-danger:#7d5456;   --st-danger-tint:#f2ecec;  --st-danger-text:#6b4749; /* trouble */
+
+  --st-code-bg:#1a1a1a;  --st-code-ink:#e6e6e6;     /* code blocks stay dark in both themes */
+
+  --st-sh-card:0 1px 2px rgba(0,0,0,.05),0 1px 1px rgba(0,0,0,.04);
+  --st-sh-bar:0 2px 6px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.05);
+  --st-sh-pop:0 10px 30px rgba(0,0,0,.10),0 1px 3px rgba(0,0,0,.06);
+}
+
+/* color - dark: the theme's own ladder (yoru / kesseki / iwa / tetsu, ink in usagi / tsuki / okami) */
+[data-theme="dark"]{
+  --st-bg:#0f0f0f;
+  --st-surface:#191919;
+  --st-surface-2:#262626;
+  --st-line:#393939;             /* 1.52:1 */
+  --st-line-soft:#2b2b2b;        /* 1.24:1 */
+  --st-ink:#e7e7e7;              /* 14.2:1 */
+  --st-ink-soft:#bfbfbf;         /* 9.6:1 */
+  --st-ink-muted:#a0a0a0;        /* 6.7:1 on surface, 5.8:1 on surface-2 */
+  --st-icon:#bfbfbf;
+
+  --st-accent:#8aacab;           /* mizu, chroma .13 */
+  --st-accent-hover:#9ec3c4;
+  --st-accent-ink:#0f0f0f;       /* 7.8:1 on the accent fill */
+  --st-accent-tint:rgba(138,172,171,.14);
+  --st-accent-text:#9ec3c4;      /* 9.3:1 on surface */
+  --st-focus:#8aacab;
+
+  --st-info:#a5b4cb;     --st-info-tint:rgba(165,180,203,.14);  --st-info-text:#b5c2d4;
+  --st-warn:#c6a679;     --st-warn-tint:rgba(198,166,121,.14);  --st-warn-text:#ceb188;
+  --st-danger:#ac8a8c;   --st-danger-tint:rgba(172,138,140,.14);--st-danger-text:#c49ea0;
+
+  --st-code-bg:#0a0a0a;
+}
+
+/* values the kit hardcodes, pulled back to the tokens above */
+.st-btn--primary{box-shadow:0 1px 2px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.10)} /* no hue in the glow */
+.st-code__head{color:#a0a0a0}
+.st-code .st-btn--icon{color:#a0a0a0}
+.scrim{background:rgba(0,0,0,.18)}
+
+/* corners: the kit's literals, so a nested corner stays inside its parent's */
+.st-tab,.st-btn--icon,.seg button{border-radius:var(--st-r-sm)}
+.st-bubble code.inline{border-radius:4px}
+
+/* numbers: bold, not black. Neue at 900 resolves to the Black cut, which reads as another face */
+.st-metric__value,.ctx-gauge__pct{font-weight:var(--st-fw-bold)}
+
+/* brand: the layer stack in ink, no wordmark - the name stays in aria-label and the tooltip,
+   and currentColor is what keeps it dark ink on the light theme, light ink on the dark theme */
+.st-header__brand{display:inline-flex;align-items:center;color:var(--st-ink)}
+.st-header__mark{width:26px;height:26px;flex:none;display:block}
+
+/* the API Monitor page (monitor.html) carries the same mark in its header */
+.brand-mark{width:26px;height:26px;vertical-align:-6px}

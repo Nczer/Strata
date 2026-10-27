@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Fork-local tab icon: the same layer stack as favicon.svg, but ink only.
+       The media queries are what let one file stay dark on light tabs and light on dark
+       tabs (the same trick apps/host/index.html plays with its png favicons); the bare
+       rules above them are the fallback for a browser that reports no scheme. -->
+  <style>
+    .f{fill:#191919}
+    .s{fill:none;stroke:#191919;stroke-width:3.67;stroke-linecap:round;stroke-linejoin:round}
+    @media (prefers-color-scheme: dark){.f{fill:#e7e7e7}.s{stroke:#e7e7e7}}
+  </style>
+  <path class="f" d="M16 2.38 28.42 9.08 16 15.78 3.58 9.08Z"/>
+  <path class="s" d="M3.58 14.8 16 21.5 28.42 14.8" opacity="0.92"/>
+  <path class="s" d="M3.58 21.28 16 27.98 28.42 21.28" opacity="0.78"/>
+</svg>
