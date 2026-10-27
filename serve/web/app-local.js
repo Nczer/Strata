@@ -19,3 +19,19 @@ if (composerWrap) {
   new ResizeObserver(publish).observe(composerWrap);
   publish();                              // the resting height, before any of the above fires
 }
+
+/* The chat view's visible height less the room the chat's own bottom padding already gives below the last
+   row, for theme-local.css: a streaming answer reserves this much space under itself so its first line can
+   sit at the top of the view while the text fills in below. clientHeight of the scroll container is the
+   visible height - it is set by the layout (header, composer, keyboard), so it moves with the on-screen
+   keyboard, tab switches and rotation, which is what the observer is for. */
+const chatScroll = document.getElementById("chat-scroll");
+if (chatScroll) {
+  const publishView = () => {
+    const chat = document.getElementById("chat");
+    const pad = chat ? parseFloat(getComputedStyle(chat).paddingBottom) || 0 : 0;
+    document.documentElement.style.setProperty("--chat-fill", `${chatScroll.clientHeight - pad}px`);
+  };
+  new ResizeObserver(publishView).observe(chatScroll);
+  publishView();
+}

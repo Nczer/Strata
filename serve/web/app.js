@@ -975,25 +975,34 @@ function renderChat() {
 // a phone count as "at the bottom", and re-pinning mid-momentum cancels the flick, so keep it narrow. The band
 // is only ever measured at the reader's own scroll: content growing on its own moves no scroll event, and by
 // the time the next frame paints, the tail has already run away from under them.
-let stick = true, mine = -1;
+let stick = true, mine = -1, hold = null;
 function nearBottom() { const s = $("chat-scroll"); return s.scrollHeight - s.scrollTop - s.clientHeight < 32; }
+function topInDoc(el) { const s = $("chat-scroll"); return el.getBoundingClientRect().top - s.getBoundingClientRect().top + s.scrollTop; }
 function scrollDown(force) {
   const s = $("chat-scroll");
-  if (force) stick = true;
+  if (force) { stick = true; hold = null; }
   else if (stick && s.scrollTop !== mine) stick = false;   // the reader moved us; their scroll event may still be in flight
+  // A new answer is held by its own top, and re-applied on every frame, because at the moment of sending that
+  // position is not legal yet: the bubble is empty, so the largest scroll available is smaller than its offset.
+  // While the answer is shorter than the view the assignment clamps to the tail, which keeps the whole answer
+  // readable; as soon as it is taller, the same assignment parks its first line at the top and the text fills
+  // the space below it. Growth is what makes the target reachable, and growth moves no scroll event.
+  if (hold && hold.isConnected) { s.scrollTop = topInDoc(hold); mine = s.scrollTop; return; }
   if (stick) { s.scrollTop = s.scrollHeight; mine = s.scrollTop; }   // read back: the browser clamps a past-the-end target
 }
-// put a new exchange at the top of the view and hold there: the answer grows below it, and only the reader
-// scrolling back down to the tail re-arms the follow. `mine` is where we last left the container.
+// hold a new answer at the top of the view (its top is the thinking block, so the reasoning comes into view
+// first) and let the answer fill in below it; only the reader scrolling re-takes the view. `mine` is where we
+// last left the container.
 function snapToTop(el) {
   const s = $("chat-scroll");
-  mine = Math.max(0, el.getBoundingClientRect().top - s.getBoundingClientRect().top + s.scrollTop);
+  hold = el;
   stick = false;
-  s.scrollTop = mine;
+  s.scrollTop = topInDoc(el);
   mine = s.scrollTop;
 }
 $("chat-scroll").addEventListener("scroll", (e) => {
   if (e.target.scrollTop === mine) return;
+  hold = null;                          // the reader touched the view: their place, not ours
   stick = nearBottom();
   if (stick) mine = e.target.scrollTop;    // they came to the tail themselves: their spot is where we leave it
 }, {passive: true});
@@ -1201,12 +1210,12 @@ async function send(payload) {
 async function generateReply() {
   const m = {role: "assistant", text: "", reasoning: "", time: Date.now()};
   messages.push(m);
+  setBusy(true);                                       // before the snap: the busy state is what reserves the answer's space
   renderChat();
   const el = $("chat").lastElementChild;
-  snapToTop(el.previousElementSibling || el);            // read the answer from its first line, not its last
+  snapToTop(el);                                       // the thinking block at the top, the answer filling in below it
   const controller = new AbortController();
   busy = {controller, msg: m, cut: false, cutAfterTool: false};
-  setBusy(true);
   paintLive();
 
   const body = {model: health.model, messages: apiMessages(), stream: true,

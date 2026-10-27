@@ -97,3 +97,13 @@
    app-local.js publishes --composer-h (132px is that height at rest - one-line draft, no
    attachments - and stays correct as a draft or an attachment row grows the composer). */
 .st-toasts{bottom:calc(var(--composer-h,132px) + 12px)}
+
+/* a streaming answer reserves the rest of the message area under itself, so the view can hold that
+   answer's first line at the top and let the text fill the space below it, instead of the view sitting
+   at the bottom of a half-written reply. It is a floor, not a height: as soon as the answer is taller
+   than the area the reservation costs nothing. Gated on the composer's busy state (#send-btn is
+   disabled for exactly as long as the stream runs) and put on the row, not the bubble, so the reserved
+   space carries no surface or border. --chat-fill is published by app-local.js as the view's height less
+   the chat's own bottom padding, so the reserved row ends exactly flush with the fold. If :has() is
+   unsupported the rule is dropped and the view holds where the answer reaches instead. */
+body:has(#send-btn:disabled) .chat>.st-msg--assistant:last-child{min-height:var(--chat-fill,60vh)}
