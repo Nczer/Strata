@@ -971,36 +971,32 @@ function renderChat() {
   renderUndoBar();
   scrollDown(true);
 }
-// Follow the answer while the reader has not left (#4014). Asking "am I within 120 px of the bottom?" on every frame pulled
-// the view back after every wheel notch (a notch is about 100 px), so scrolling up during a long answer only worked by
-// dragging the scrollbar. Now the reader's own input lets go (wheel up, a finger or a key moving up, the scrollbar), and a
-// scroll back to the bottom follows again.
-let stickToBottom = true, lastReaderInput = 0;
-const FOLLOW_SLACK = 24, FAR_AWAY = 400, INPUT_WINDOW_MS = 400;
-function followAfterScroll(distance, wasFollowing, msSinceInput) {
-  if (distance <= FOLLOW_SLACK) return true;
-  if (msSinceInput <= INPUT_WINDOW_MS || distance > FAR_AWAY) return false;
-  return wasFollowing;
-}
+// The view follows the tail only while the reader sits at the bottom of it. A wide band made every flick-up on
+// a phone count as "at the bottom", and re-pinning mid-momentum cancels the flick, so keep it narrow. The band
+// is only ever measured at the reader's own scroll: content growing on its own moves no scroll event, and by
+// the time the next frame paints, the tail has already run away from under them.
+let stick = true, mine = -1;
+function nearBottom() { const s = $("chat-scroll"); return s.scrollHeight - s.scrollTop - s.clientHeight < 32; }
 function scrollDown(force) {
   const s = $("chat-scroll");
-  if (force) stickToBottom = true;
-  if (stickToBottom) s.scrollTop = s.scrollHeight;
+  if (force) stick = true;
+  else if (stick && s.scrollTop !== mine) stick = false;   // the reader moved us; their scroll event may still be in flight
+  if (stick) { s.scrollTop = s.scrollHeight; mine = s.scrollTop; }   // read back: the browser clamps a past-the-end target
 }
-(function watchReader() {
+// put a new exchange at the top of the view and hold there: the answer grows below it, and only the reader
+// scrolling back down to the tail re-arms the follow. `mine` is where we last left the container.
+function snapToTop(el) {
   const s = $("chat-scroll");
-  const touch = () => { lastReaderInput = Date.now(); };
-  s.addEventListener("wheel", (e) => { touch(); if (e.deltaY < 0 && s.scrollTop > 0) stickToBottom = false; }, {passive: true});
-  s.addEventListener("touchmove", touch, {passive: true});
-  s.addEventListener("pointerdown", touch, {passive: true});
-  s.addEventListener("keydown", (e) => {
-    touch();
-    if (["PageUp", "ArrowUp", "Home"].includes(e.key) && e.target === s && s.scrollTop > 0) stickToBottom = false;
-  });
-  s.addEventListener("scroll", () => {
-    stickToBottom = followAfterScroll(s.scrollHeight - s.scrollTop - s.clientHeight, stickToBottom, Date.now() - lastReaderInput);
-  }, {passive: true});
-})();
+  mine = Math.max(0, el.getBoundingClientRect().top - s.getBoundingClientRect().top + s.scrollTop);
+  stick = false;
+  s.scrollTop = mine;
+  mine = s.scrollTop;
+}
+$("chat-scroll").addEventListener("scroll", (e) => {
+  if (e.target.scrollTop === mine) return;
+  stick = nearBottom();
+  if (stick) mine = e.target.scrollTop;    // they came to the tail themselves: their spot is where we leave it
+}, {passive: true});
 
 $("chat").addEventListener("click", (e) => {
   const cc = e.target.closest("[data-code-copy]");
@@ -1207,6 +1203,7 @@ async function generateReply() {
   messages.push(m);
   renderChat();
   const el = $("chat").lastElementChild;
+  snapToTop(el.previousElementSibling || el);            // read the answer from its first line, not its last
   const controller = new AbortController();
   busy = {controller, msg: m, cut: false, cutAfterTool: false};
   setBusy(true);
